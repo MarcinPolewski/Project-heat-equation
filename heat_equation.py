@@ -23,6 +23,7 @@ if __name__ == "__main__":
     t=0
     default_val=0
     stop=0
+    wait=1
     alpha=0.24
     points = [
         [5, 5, 10000]
@@ -45,19 +46,23 @@ if __name__ == "__main__":
             points = config['points']
         if 'default_val' in config:
             default_val = config['default_val']
+        if 'wait' in config:
+            default_val = config['wait']
 
     u=np.full([x_size,y_size], default_val)
 
     for x,y,temprature in points:
         u[x][y]=temprature
+    max_temp=np.max(u)
+    min_temp=np.min(u)
 
     plt.show()
 
     while t<T:
         if t>=stop:
-            p=plt.imshow(u,cmap='coolwarm')
+            p=plt.imshow(u,cmap='coolwarm',vmin=min_temp,vmax=max_temp)
             plt.colorbar(p)
-            plt.pause(1)
+            plt.pause(wait)
             plt.clf()
             stop+=T/plots
 
