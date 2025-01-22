@@ -15,6 +15,7 @@ class HeatEquationSolver:
             plot_method = self.plot_heat_map_2d
         self.numeric_method = numeric_method
         self.plot_method = plot_method
+        self.wait_time = wait
 
     @staticmethod
     def next_step_FTCS(u, alpha, dt, dx):
@@ -28,7 +29,7 @@ class HeatEquationSolver:
         return u_new
 
     @staticmethod
-    def plot_heat_map_2d(u, min_temp, max_temp):
+    def plot_heat_map_2d(u, min_temp, max_temp, wait_time):
         if not hasattr(HeatEquationSolver, "_fig2d"):
             HeatEquationSolver._fig2d = plt.figure()
         plt.figure(HeatEquationSolver._fig2d.number)
@@ -36,10 +37,10 @@ class HeatEquationSolver:
         p = plt.imshow(u, cmap="coolwarm", vmin=min_temp, vmax=max_temp)
         plt.colorbar(p)
         plt.draw()
-        plt.pause(0.5)
+        plt.pause(wait_time)
 
     @staticmethod
-    def plot_heat_map_3d(u, min_temp, max_temp):
+    def plot_heat_map_3d(u, min_temp, max_temp, wait_time):
         if not hasattr(HeatEquationSolver, "_fig3d"):
             HeatEquationSolver._fig3d = plt.figure()
         fig = HeatEquationSolver._fig3d
@@ -50,8 +51,10 @@ class HeatEquationSolver:
         y = np.arange(cols)
         x, y = np.meshgrid(x, y)
         ax.plot_surface(x, y, u, cmap="coolwarm", vmin=min_temp, vmax=max_temp)
+        ax.set_zlim(min_temp, max_temp)
+
         plt.draw()
-        plt.pause(0.5)
+        plt.pause(wait_time)
 
     def solve(self, u, alpha, dt, dx, T, plots):
 
@@ -64,7 +67,7 @@ class HeatEquationSolver:
         t = 0
         while t < T:
             if t >= stop:
-                self.plot_method(u, min_temp, max_temp)
+                self.plot_method(u, min_temp, max_temp, self.wait_time)
                 stop += T / plots
             u = self.numeric_method(u, alpha, dt, dx)
             t += dt
