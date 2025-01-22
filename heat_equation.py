@@ -29,23 +29,29 @@ class HeatEquationSolver:
 
     @staticmethod
     def plot_heat_map_2d(u, min_temp, max_temp):
+        if not hasattr(HeatEquationSolver, "_fig2d"):
+            HeatEquationSolver._fig2d = plt.figure()
+        plt.figure(HeatEquationSolver._fig2d.number)
+        plt.clf()
         p = plt.imshow(u, cmap="coolwarm", vmin=min_temp, vmax=max_temp)
         plt.colorbar(p)
-        plt.pause(1)
-        plt.clf()
+        plt.draw()
+        plt.pause(0.5)
 
     @staticmethod
     def plot_heat_map_3d(u, min_temp, max_temp):
-        fig = plt.figure()
+        if not hasattr(HeatEquationSolver, "_fig3d"):
+            HeatEquationSolver._fig3d = plt.figure()
+        fig = HeatEquationSolver._fig3d
+        fig.clf()
         ax = fig.add_subplot(111, projection="3d")
         rows, cols = u.shape
-        x = np.arange(0, rows, 1)
-        y = np.arange(0, cols, 1)
+        x = np.arange(rows)
+        y = np.arange(cols)
         x, y = np.meshgrid(x, y)
         ax.plot_surface(x, y, u, cmap="coolwarm", vmin=min_temp, vmax=max_temp)
-
-        plt.pause(1)
-        plt.clf()
+        plt.draw()
+        plt.pause(0.5)
 
     def solve(self, u, alpha, dt, dx, T, plots):
 
@@ -80,7 +86,6 @@ def main():
     T = 1
     x_size = 10
     y_size = 10
-    default_val = 0.001
     alpha = 0.24
     points = [[5, 5, 10000]]
     default_val = 0.001
