@@ -8,7 +8,16 @@ import matplotlib.pyplot as plt
 
 class HeatEquationSolver:
 
-    def next_step_FTCS(self, u, alpha, dt, dx):
+    def __init__(self, wait, numeric_method=None, plot_method=None):
+        if numeric_method is None:
+            numeric_method = self.next_step_FTCS
+        if plot_method is None:
+            plot_method = self.plot_heat_map_2d
+        self.numeric_method = numeric_method
+        self.plot_method = plot_method
+
+    @staticmethod
+    def next_step_FTCS(u, alpha, dt, dx):
         u_new = u.copy()
         rows, cols = u.shape
         for j in range(1, cols - 1):
@@ -18,9 +27,23 @@ class HeatEquationSolver:
                 )
         return u_new
 
-    def plot_heat_map_2d(self, u, min_temp, max_temp):
+    @staticmethod
+    def plot_heat_map_2d(u, min_temp, max_temp):
         p = plt.imshow(u, cmap="coolwarm", vmin=min_temp, vmax=max_temp)
         plt.colorbar(p)
+        plt.pause(1)
+        plt.clf()
+
+    @staticmethod
+    def plot_heat_map_3d(u, min_temp, max_temp):
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
+        rows, cols = u.shape
+        x = np.arange(0, rows, 1)
+        y = np.arange(0, cols, 1)
+        x, y = np.meshgrid(x, y)
+        ax.plot_surface(x, y, u, cmap="coolwarm", vmin=min_temp, vmax=max_temp)
+
         plt.pause(1)
         plt.clf()
 
@@ -35,9 +58,9 @@ class HeatEquationSolver:
         t = 0
         while t < T:
             if t >= stop:
-                self.plot_heat_map_2d(u, min_temp, max_temp)
+                self.plot_method(u, min_temp, max_temp)
                 stop += T / plots
-            u = self.next_step_FTCS(u, alpha, dt, dx)
+            u = self.numeric_method(u, alpha, dt, dx)
             t += dt
 
 
@@ -57,9 +80,12 @@ def main():
     T = 1
     x_size = 10
     y_size = 10
-    default_val = 0
+    default_val = 0.001
     alpha = 0.24
     points = [[5, 5, 10000]]
+    wait = 1
+    numeric_method = HeatEquationSolver.next_step_FTCS
+    plot_method = HeatEquationSolver.plot_heat_map_2d
     with open(args.config, "r") as f:
         config = json.load(f)
         if "dt" in config:
@@ -80,13 +106,21 @@ def main():
             default_val = config["default_val"]
         if "wait" in config:
             default_val = config["wait"]
+        if "numeric_method" in config:
+            if config["numeric_method"] == "FTCS":
+                numeric_method = HeatEquationSolver.next_step_FTCS
+        if "plot_method" in config:
+            if config["plot_method"] == "2d":
+                plot_method = HeatEquationSolver.plot_heat_map_2d
+            elif config["plot_method"] == "3d":
+                plot_method = HeatEquationSolver.plot_heat_map_3d
 
     u = np.full([x_size, y_size], default_val)
 
     for x, y, temprature in points:
         u[x][y] = temprature
 
-    solver = HeatEquationSolver()
+    solver = HeatEquationSolver(wait, numeric_method, plot_method)
     solver.solve(u, alpha, dt, dx, T, plots)
 
 
