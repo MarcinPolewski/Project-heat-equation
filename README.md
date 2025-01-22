@@ -19,3 +19,18 @@ Config.json file allows to configure:
 • plots: number of plot outputs through out simulation
 • points: coordinates with initial temperature values 
 • default_val: default temperature of points
+
+# Used numeric methods:
+- FTCS (Forward-Time Centered-Space)
+    - simple to implement, no need to solve system of equations
+    - has a stability condition - delta t has to be small enough with regards to delta x
+    - may be inacurate for large time steps
+
+- BTCS(Backward-Time Centered-Space)
+    - next time step is computed by solving a system of linear equations
+    - always stable
+    - more acurate than FTCS with large time steps
+    - more computationally expensive
+
+# Sources:
+- (section with heat equation) https://en.wikipedia.org/wiki/Finite_difference_method

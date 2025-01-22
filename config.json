@@ -6,6 +6,7 @@
     "dt": 0.01,
     "plots": 50,
     "plot_method": "3d",
+    "numeric_method": "BTCS",
     "points": [
 [15,15,100],
 [15,16,100],
