@@ -5,6 +5,9 @@ import pathlib
 import numpy as np
 import matplotlib.pyplot as plt
 
+from scipy.sparse import diags
+from scipy.sparse.linalg import spsolve
+
 
 class HeatEquationSolver:
 
@@ -27,6 +30,34 @@ class HeatEquationSolver:
                     u[i - 1, j] + u[i + 1, j] + u[i, j - 1] + u[i, j + 1] - 4 * u[i, j]
                 )
         return u_new
+
+    @staticmethod
+    def next_step_BTCS(u, alpha, dt, dx):
+        rows, cols = u.shape
+        size = rows * cols
+        coeff = alpha * dt / dx**2
+
+        # Create the coefficient matrix
+        # laplace_matrix represents discretized laplace operator
+        # for heat equation in 2D. It encodes the relationships between each grid point and its neighbors
+        main_diag = (1 + 4 * coeff) * np.ones(size)
+        off_diag = -coeff * np.ones(size - 1)
+        laplace_matrix = diags(
+            [
+                main_diag,
+                off_diag,
+                off_diag,
+                -coeff * np.ones(size - rows),
+                -coeff * np.ones(size - rows),
+            ],
+            [0, 1, -1, rows, -rows],
+            format="csr",
+        )
+
+        # solve equation system
+        u_flat = u.flatten()
+        u_new_flat = spsolve(laplace_matrix, u_flat)
+        return u_new_flat.reshape(rows, cols)
 
     @staticmethod
     def plot_heat_map_2d(u, min_temp, max_temp, wait_time):
@@ -118,11 +149,17 @@ def main():
         if "numeric_method" in config:
             if config["numeric_method"] == "FTCS":
                 numeric_method = HeatEquationSolver.next_step_FTCS
+            elif config["numeric_method"] == "BTCS":
+                numeric_method = HeatEquationSolver.next_step_BTCS
+            else:
+                raise ValueError("Invalid numeric method")
         if "plot_method" in config:
             if config["plot_method"] == "2d":
                 plot_method = HeatEquationSolver.plot_heat_map_2d
             elif config["plot_method"] == "3d":
                 plot_method = HeatEquationSolver.plot_heat_map_3d
+            else:
+                raise ValueError("Invalid plot method")
 
     u = np.full([x_size, y_size], default_val)
 
