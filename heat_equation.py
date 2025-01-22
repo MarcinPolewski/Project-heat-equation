@@ -83,6 +83,7 @@ def main():
     default_val = 0.001
     alpha = 0.24
     points = [[5, 5, 10000]]
+    default_val = 0.001
     wait = 1
     numeric_method = HeatEquationSolver.next_step_FTCS
     plot_method = HeatEquationSolver.plot_heat_map_2d
@@ -105,7 +106,7 @@ def main():
         if "default_val" in config:
             default_val = config["default_val"]
         if "wait" in config:
-            default_val = config["wait"]
+            wait = config["wait"]
         if "numeric_method" in config:
             if config["numeric_method"] == "FTCS":
                 numeric_method = HeatEquationSolver.next_step_FTCS
