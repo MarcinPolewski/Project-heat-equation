@@ -32,5 +32,12 @@ Config.json file allows to configure:
     - more acurate than FTCS with large time steps
     - more computationally expensive
 
+# Results:
+3D simulation:
+![3D simulatin image](results/simulation_3d.png)
+
+2D simulation
+![2D simulatin image](results/simulation_2d.png)
+
 # Sources:
 - (section with heat equation) https://en.wikipedia.org/wiki/Finite_difference_method
